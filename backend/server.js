@@ -10,7 +10,14 @@ require("dotenv").config();
 
 const PORT = process.env.PORT || 8090;
 
-app.use(cors());
+const corsOptions = {
+    origin: '*',
+    methods: 'GET,POST',
+    allowedHeaders: 'Content-Type,Authorization',
+  };
+  
+app.use(cors(corsOptions));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
