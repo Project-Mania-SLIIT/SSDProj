@@ -132,41 +132,39 @@ router.post('/token',(req,res)=>{
 
 //fetch users start (with pagination)
 
-router.get("/users",auth, async (req, res) => {
+router.get("/users", auth, async (req, res) => {
+    try {
+        let { page, size, search } = req.query;
 
-	try {
-		
-        let {page, size ,search}=req.query       
+        if (!page) {
+            page = 1;
+        }
+        if (!size) {
+            size = 5;
+        }
 
-        if(!page){
-            page=1;
-        }
-        if(!size){
-            size=5;
-        }
-        
         const limit = parseInt(size);
-        const skip = (page-1)*size;
+        const skip = (page - 1) * size;
 
-
-        if(search==null||search===""){
-            const users = await User.find().limit(limit).skip(skip);   
+        if (search == null || search === "") {
+            const users = await User.find().limit(limit).skip(skip);
             res.send(users);
-            
-        }else{
+        } else {
+            const regexPattern = new RegExp(search, "i");
             const users = await User.find({
-            $or: [{ firstname: { $regex: search, $options: "i" }.toString()},{lastname: { $regex: search, $options: "i" }.toString()},{email: { $regex: search, $options: "i" }.toString()}],
-            }).limit(limit).skip(skip);      
+                $or: [
+                    { firstname: { $regex: regexPattern } },
+                    { lastname: { $regex: regexPattern } },
+                    { email: { $regex: regexPattern } }
+                ]
+            }).limit(limit).skip(skip);
             res.send(users);
         }
-
-     
-
-
-	} catch (error) {
-		res.sendStatus(500).send({ message: "Internal Server Error" });
-	}
+    } catch (error) {
+        res.status(500).send({ message: "Internal Server Error" });
+    }
 });
+
 
 //fetch user end
 
