@@ -146,11 +146,18 @@ router.get("/users", auth, async (req, res) => {
         const limit = parseInt(size);
         const skip = (page - 1) * size;
 
-        if (search == null || search === "") {
+        let regexPattern = "";
+
+        if (search && typeof search === "string") {
+            // Sanitize and escape special regex characters from user input
+            regexPattern = search.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+        }
+
+        if (regexPattern === "") {
             const users = await User.find().limit(limit).skip(skip);
             res.send(users);
         } else {
-            const regexPattern = new RegExp(search, "i");
+            regexPattern = new RegExp(regexPattern, "i");
             const users = await User.find({
                 $or: [
                     { firstname: { $regex: regexPattern } },
@@ -164,6 +171,7 @@ router.get("/users", auth, async (req, res) => {
         res.status(500).send({ message: "Internal Server Error" });
     }
 });
+
 
 
 //fetch user end
