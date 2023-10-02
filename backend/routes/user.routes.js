@@ -159,7 +159,7 @@ router.get("/users", auth, async (req, res) => {
             ];
         }
 
-        const users = await User.find(filter).toString().limit(limit).skip(skip);
+        const users = await User.find(filter.toString()).limit(limit).skip(skip);
         res.send(users);
     } catch (error) {
         res.status(500).send({ message: "Internal Server Error" });
