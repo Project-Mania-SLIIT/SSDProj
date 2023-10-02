@@ -55,8 +55,8 @@ router.get("/notes",async (req, res) => {
         
         const limit = parseInt(size);
         const skip = (page-1)*size;
-        const count=  await Note.find({status : 'Active', userid:userid}).count();
-        const notes = await Note.find({status : 'Active', userid:userid}).limit(limit).skip(skip);
+        const count=  await Note.find({status : 'Active', userid:userid.toString()}).count();
+        const notes = await Note.find({status : 'Active', userid:userid.toString()}).limit(limit).skip(skip);
          
         res.send({data: notes, count: parseInt(count/limit)});
 

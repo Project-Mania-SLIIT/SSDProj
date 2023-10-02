@@ -24,7 +24,7 @@ router.post("/register", async (req, res) => {
 			numbers: true
 		});
 
-		let user = await User.findOne({ email: email });
+		let user = await User.findOne({ email: email.toString() });
 		if (user){
 			return res.status(409).send({ message: "User with given email already Exist!" });
         }
@@ -74,7 +74,7 @@ router.post('/login', async (req,res)=>{
 
    try {
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email.toString() });
 
     if (!user)
         return res.status(400).send({ message: "Invalid Email" });
@@ -155,7 +155,7 @@ router.get("/users",auth, async (req, res) => {
             
         }else{
             const users = await User.find({
-            $or: [{ firstname: { $regex: search, $options: "i" }},{lastname: { $regex: search, $options: "i" }},{email: { $regex: search, $options: "i" }}],
+            $or: [{ firstname: { $regex: search, $options: "i" }.toString()},{lastname: { $regex: search, $options: "i" }.toString()},{email: { $regex: search, $options: "i" }.toString()}],
             }).limit(limit).skip(skip);      
             res.send(users);
         }
