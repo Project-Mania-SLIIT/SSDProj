@@ -146,31 +146,26 @@ router.get("/users", auth, async (req, res) => {
         const limit = parseInt(size);
         const skip = (page - 1) * size;
 
-        let regexPattern = "";
+        const filter = {};
 
         if (search && typeof search === "string") {
-            // Sanitize and escape special regex characters from user input
-            regexPattern = search.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+            // Sanitize and escape special characters from user input
+            const sanitizedSearch = search.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "");
+            // Add sanitized search to the filter
+            filter.$or = [
+                { firstname: { $regex: sanitizedSearch, $options: "i" } },
+                { lastname: { $regex: sanitizedSearch, $options: "i" } },
+                { email: { $regex: sanitizedSearch, $options: "i" } }
+            ];
         }
 
-        if (regexPattern === "") {
-            const users = await User.find().limit(limit).skip(skip);
-            res.send(users);
-        } else {
-            regexPattern = new RegExp(regexPattern, "i");
-            const users = await User.find({
-                $or: [
-                    { firstname: { $regex: regexPattern } },
-                    { lastname: { $regex: regexPattern } },
-                    { email: { $regex: regexPattern } }
-                ]
-            }).limit(limit).skip(skip);
-            res.send(users);
-        }
+        const users = await User.find(filter).limit(limit).skip(skip);
+        res.send(users);
     } catch (error) {
         res.status(500).send({ message: "Internal Server Error" });
     }
 });
+
 
 
 
