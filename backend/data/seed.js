@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 let {User} = require('../models/user');
 
 
-const URL='mongodb://mongodb:27017/surgeassignment_db';
+const URL='mongodb+srv://shanuxgroup:Shanu1999@cluster0.1gxoi3y.mongodb.net/surge?retryWrites=true&w=majority';
 
 const newUser = new User({ 
     _id:0,             
