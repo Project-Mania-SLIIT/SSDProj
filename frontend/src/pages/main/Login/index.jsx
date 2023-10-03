@@ -12,6 +12,14 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   
+  const googleAuth = () => {
+		window.open(
+			`http://localhost:8090/user/google/callback`,
+			"_self"
+		);
+	};
+
+  
   const handleChangeEmail = (event) => {
     setEmail(event.target.value);  
   
@@ -113,8 +121,13 @@ const Login = () => {
             </div>
             <div className="d-grid gap-2 mt-3">
               <button type="submit" className="btn btn-primary">
-                Submit
+                Login
               </button>
+              <p >or</p>
+				    	<button className='google_btn' onClick={googleAuth}>
+						<img src="./images/google.png" alt="google icon" />
+				  		<span>Sing in with Google</span>
+					   </button>
             </div>
             <p className="forgot-password text-right mt-2">
               Forgot <a href="#">password?</a>
