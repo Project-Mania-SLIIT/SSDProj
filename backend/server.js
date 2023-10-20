@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const app = express();
+app.disable('x-powered-by');
 const auth = require('./middleware/auth.js');
 require("dotenv").config();
 const passport = require("passport");
@@ -30,6 +31,7 @@ app.use(
 		credentials: true,
 	})
 );
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

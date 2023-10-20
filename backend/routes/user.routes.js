@@ -25,7 +25,7 @@ router.post("/register", async (req, res) => {
 			numbers: true
 		});
 
-		let user = await User.findOne({ email: email });
+		let user = await User.findOne({ email: email.toString() });
 		if (user){
 			return res.status(409).send({ message: "User with given email already Exist!" });
         }
@@ -72,7 +72,7 @@ router.post('/login', async (req,res)=>{
     const email= req.body.email;
     const password = req.body.password;
    try {
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email.toString() });
     if (!user)
         return res.status(400).send({ message: "Invalid Email" });
 
@@ -126,41 +126,42 @@ router.post('/token',(req,res)=>{
 
 //fetch users start (with pagination)
 
-router.get("/users",auth, async (req, res) => {
+router.get("/users", auth, async (req, res) => {
+    try {
+        let { page, size, search } = req.query;
 
-	try {
-		
-        let {page, size ,search}=req.query       
+        if (!page) {
+            page = 1;
+        }
+        if (!size) {
+            size = 5;
+        }
 
-        if(!page){
-            page=1;
-        }
-        if(!size){
-            size=5;
-        }
-        
         const limit = parseInt(size);
-        const skip = (page-1)*size;
+        const skip = (page - 1) * size;
 
+        const filter = {};
 
-        if(search==null||search===""){
-            const users = await User.find().limit(limit).skip(skip);   
-            res.send(users);
-            
-        }else{
-            const users = await User.find({
-            $or: [{ firstname: { $regex: search, $options: "i" }},{lastname: { $regex: search, $options: "i" }},{email: { $regex: search, $options: "i" }}],
-            }).limit(limit).skip(skip);      
-            res.send(users);
+        if (search && typeof search === "string") {
+            // Sanitize and escape special characters from user input
+            const sanitizedSearch = search.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "");
+            // Add sanitized search to the filter
+            filter.$or = [
+                { firstname: { $regex: sanitizedSearch, $options: "i" } },
+                { lastname: { $regex: sanitizedSearch, $options: "i" } },
+                { email: { $regex: sanitizedSearch, $options: "i" } }
+            ];
         }
 
-     
-
-
-	} catch (error) {
-		res.sendStatus(500).send({ message: "Internal Server Error" });
-	}
+        const users = await User.find(filter.toString()).limit(limit).skip(skip);
+        res.send(users);
+    } catch (error) {
+        res.status(500).send({ message: "Internal Server Error" });
+    }
 });
+
+
+
 
 //fetch user end
 

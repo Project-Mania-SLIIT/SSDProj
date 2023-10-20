@@ -1,20 +1,42 @@
 const mongoose = require('mongoose');
 let {User} = require('../models/user');
+const bcrypt = require('bcrypt');
 
 
 const URL='mongodb+srv://shanuxgroup:Shanu1999@cluster0.1gxoi3y.mongodb.net/surge?retryWrites=true&w=majority';
 
-const newUser = new User({ 
-    _id:0,             
-    firstname:"Pasindu",
-    lastname:"Lakshan",
-    email:"admin@gmail.com",
-    dateofbirth:"2010-10-09",
-    mobile:"0773245322",
-    status:true,
-    password:"$2b$10$cTO.VoDNCZzV1RpZweds9eg9rIpFXld0CQ.ZcmZnKKSO5Efd3vvgi",
-    accounttype:"Admin"
-})
+const newPassword = "$2b$10$cTO.VoDNCZzV1RpZweds9eg9rIpFXld0CQ.ZcmZnKKSO5Efd3vvgi";
+const saltRounds = 10;
+
+bcrypt.hash(newPassword, saltRounds, (err, hash) => {
+  if (err) {
+    console.error('Error hashing password:', err);
+  } else {
+    const newUser = new User({
+      _id: 0,
+      firstname: "Pasindu",
+      lastname: "Lakshan",
+      email: "admin@gmail.com",
+      dateofbirth: "2010-10-09",
+      mobile: "0773245322",
+      status: true,
+      password: hash, // Store the hashed password
+      accounttype: "Admin"
+    });
+
+    // Save the newUser object to your database
+    newUser.save((saveErr) => {
+      if (saveErr) {
+        console.error('Error saving user:', saveErr);
+      } else {
+        console.log('User saved successfully.');
+      }
+    });
+  }
+});
+
+
+
 
 
 const SeedDB = async () =>{
