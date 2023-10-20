@@ -3,7 +3,7 @@ let {User} = require('../models/user');
 const bcrypt = require('bcrypt');
 
 
-const URL='mongodb://mongodb:27017/surgeassignment_db';
+const URL='mongodb+srv://shanuxgroup:Shanu1999@cluster0.1gxoi3y.mongodb.net/surge?retryWrites=true&w=majority';
 
 const newPassword = "$2b$10$cTO.VoDNCZzV1RpZweds9eg9rIpFXld0CQ.ZcmZnKKSO5Efd3vvgi";
 const saltRounds = 10;

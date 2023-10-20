@@ -7,16 +7,31 @@ const app = express();
 app.disable('x-powered-by');
 const auth = require('./middleware/auth.js');
 require("dotenv").config();
+const passport = require("passport");
+const cookieSession = require("cookie-session");
+const passportStrategy = require("./passport");
 
 const PORT = process.env.PORT || 8090;
 
-const corsOptions = {
-    origin: '/user',
-    methods: 'GET,POST',
-    allowedHeaders: 'Content-Type,Authorization',
-  };
-  
-app.use(cors(corsOptions));
+app.use(
+	cookieSession({
+		name: "session",
+		keys: ["cyberwolve"],
+		maxAge: 24 * 60 * 60 * 100,
+	})
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+		methods: "GET,POST,PUT,DELETE",
+		credentials: true,
+	})
+);
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -7,6 +7,7 @@ const jwt =require('jsonwebtoken');
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const auth = require('../middleware/auth.js');
+const passport = require("passport");
 
 let refreshTokens=[]; 
 
@@ -70,12 +71,8 @@ router.post("/register", async (req, res) => {
 router.post('/login', async (req,res)=>{
     const email= req.body.email;
     const password = req.body.password;
-
-
    try {
-
     const user = await User.findOne({ email: email.toString() });
-
     if (!user)
         return res.status(400).send({ message: "Invalid Email" });
 
@@ -87,12 +84,10 @@ router.post('/login', async (req,res)=>{
     if (!validPassword)
         return res.status(400).send({ message: "Incorrect Password " });
 
-
      const tokendetails= {email:user.email,type:user.accounttype,status:user.status};
      const accessToken=jwt.sign(tokendetails,process.env.TOKEN_KEY,{expiresIn: '1d'});
      const refreshToken= jwt.sign(tokendetails,process.env.RE_TOKEN_KEY,{expiresIn: '2d'});
      refreshTokens.push(refreshToken);
-
      const data = {
         id: user._id,
         email: user.email,
@@ -101,7 +96,6 @@ router.post('/login', async (req,res)=>{
         permissionlevel: user.accounttype,
         status:user.status
     };
-
      res.status(200).send(data)
 
 
@@ -214,6 +208,38 @@ router.put("/completeprofile/:id",auth, async (req, res) => {
 });
 
 //profile complete end
+
+
+router.get("/google", passport.authenticate("google", ["profile", "email"]));
+
+router.get(
+	"/google/callback",
+	passport.authenticate("google", {
+		successRedirect: process.env.CLIENT_URL,
+		failureRedirect: "/login/failed",
+	})
+);
+
+
+router.get('/login/failed', async (req,res)=>{
+    return res.status(400).send({ message: "Login Failed " });
+})
+
+
+router.get("/login/success", (req, res) => {
+	if (req.user) {
+		res.status(200).json({
+			error: false,
+			message: "Successfully Loged In",
+			user: req.user,
+		});
+	} else {
+		res.status(403).json({ error: true, message: "Not Authorized" });
+	}
+});
+
+
+
 
 
 
